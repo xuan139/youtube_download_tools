@@ -6,6 +6,8 @@ import os
 import subprocess
 from datetime import datetime
 import common_functions
+import re
+import shutil
 
 # author lixuan2001@gmail.com
 
@@ -202,74 +204,122 @@ def update_progress(row_id,progress_dict):
             print()
 
 
-def list_files_with_same_name(filename):
-    directory = os.path.dirname(filename)
 
-    # 遍历目录
+def find_files_with_same_basename(file_path):
     # 获取文件名（不包括扩展名）
+    # base_name = os.path.splitext(os.path.basename(file_path))[0]
 
-    print('directory',directory)
-    base_filename, _ = os.path.splitext(filename)
-    print('base_filename',base_filename)
+        # 获取文件名（包括扩展名）
+    full_name = os.path.basename(file_path)
+    print('full_name',full_name)
+    # 提取文件名（不包括扩展名）
+    base_name = full_name.split(".")[0]
+ 
+    print('base_name',base_name)
 
-    matching_files = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            # 标准化为绝对路径
-            full_path = os.path.join(root, file)
+    # 获取文件所在目录
+    directory_path = os.path.dirname(file_path)
+    print('directory_path',directory_path)
+    all_files = os.listdir(directory_path)
 
-            name, ext = os.path.splitext(os.path.abspath(file))
+    ext_pattern =  r'.*'  # 此处使用正则表达式匹配包含两个点的扩展名
+    ext_regex = re.compile(ext_pattern)
+     # 找到与输入文件名相同的文件，且扩展名匹配指定的正则表达式
+    matching_files = [os.path.join(directory_path, file) for file in all_files if file.split(".")[0] == base_name and ext_regex.match(os.path.splitext(file)[1])]
+    return matching_files
 
-            print('os.path.abspath',os.path.abspath(file))
-            print('base_filename',base_filename)      
-            if  name == base_filename:
-                matching_files.append(full_path)
-    
-    return matching_files               
+
+def on_double_click(event, listbox):
+    # 获取双击的项的索引
+    selected_index = listbox.nearest(event.y)
+
+    if selected_index is not None:
+        # 获取双击的项的文本
+        selected_item = listbox.get(selected_index)
+        common_functions.openselectedfile(selected_item)
 
 def show_popup(filename):
+    try:
+        print('popup filename',filename)
+        matching_files = find_files_with_same_basename(filename)
 
-    print('popup filename',filename)
-    popup = tk.Toplevel(root)
-    popup.title("File Details")
+        for file in matching_files:
+            print("File with the same basename:", file)
 
-    # Calculate the screen width and height
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
+        popup = tk.Toplevel(root)
+        popup.title("File Details")
 
-    # Set the width to 1/6 of the screen width and the height to 1/2 of the screen height
-    width = screen_width // 6
-    height = screen_height // 2
+        # Calculate the screen width and height
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
 
-    # Calculate the X and Y coordinates to center the popup
-    x = (screen_width - width) // 2
-    y = (screen_height - height) // 2
+        # Set the width to 1/6 of the screen width and the height to 1/2 of the screen height
+        width = screen_width // 2
+        height = screen_height // 2
 
-    popup.geometry(f"{width}x{height}+{x}+{y}")
+        # Calculate the X and Y coordinates to center the popup
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
 
-    text = tk.Text(popup, wrap="word", height=10, width=40)
-    text.insert("1.0", f"Filename: {filename}")
-    text.pack(fill="both", expand=True)  # Expand both horizontally and vertically
+        popup.geometry(f"{width}x{height}+{x}+{y}")
 
-    button_frame = tk.Frame(popup)
-    button_frame.pack(fill="x", expand=True)  # Expand horizontally
+        # text = tk.Text(popup, wrap="word", height=10, width=40)
+        # text.insert("1.0", f"Filename: {filename}")
+        # text.pack(fill="both", expand=True)  # Expand both horizontally and vertically
 
-    open_button = tk.Button(button_frame, text="Open Dir", command=open_file)
-    open_button.pack(side="left", fill="x", expand=True)
+        # 创建一个Listbox
+        listbox = tk.Listbox(popup)
+        listbox.pack(fill=tk.BOTH, expand=True)
 
-    play_button = tk.Button(button_frame, text="Open", command=lambda: common_functions.play_video(filename))
-    play_button.pack(side="left", fill="x", expand=True)
+        # 将匹配的文件添加到Listbox中
+        for file in matching_files:
+            listbox.insert(tk.END, file)
 
-    close_button = tk.Button(button_frame, text="Close", command=lambda: custom_close_function(popup))
-    close_button.pack(side="left", fill="x", expand=True)
+        # listbox.bind("<Double-1>", on_double_click)
+        # 绑定双击事件处理函数，并传递listbox作为参数
+        listbox.bind("<Double-1>", lambda event, lb=listbox: on_double_click(event, lb))
 
-    root.mainloop()
+        button_frame = tk.Frame(popup)
+        button_frame.pack(fill="x", expand=True)  # Expand horizontally
+
+        open_button = tk.Button(button_frame, text="Archive", command=archive_file(listbox))
+        open_button.pack(side="left", fill="x", expand=True)
+
+        # play_button = tk.Button(button_frame, text="Open", command=lambda: common_functions.play_video(filename))
+        # play_button.pack(side="left", fill="x", expand=True)
+
+        close_button = tk.Button(button_frame, text="Close", command=lambda: custom_close_function(popup))
+        close_button.pack(side="left", fill="x", expand=True)
+
+        root.mainloop()
+    except:
+        pass
 
 
-def open_file():
-    # Add code to open the file associated with the selected row
-    # pass
-    subprocess.Popen(['open',  common_functions.get_default_downloads_directory()])
+
+def archive_file(listbox):
+    try:
+        output_directory =  listbox.get(0).split(".")[0]
+        print('output_directory',output_directory)
+
+        os.makedirs(output_directory, exist_ok=True)
+
+        for i in range(listbox.size()):
+            item = listbox.get(i)
+            if os.path.isfile(item):
+                try:
+                    # 直接复制文件到目录
+                    shutil.copy(item, output_directory)
+                    # os.remove(item)
+                except Exception as e:
+                    print(f"Error copying {item} to {output_directory}: {str(e)}")
+            else:
+                print(f"Skipping {item} as it's not a file.")
+
+
+    except:
+        pass
+        
 
 
 def custom_close_function(popup):
@@ -278,7 +328,9 @@ def custom_close_function(popup):
     populate_download_listbox()
     # 这里可以添加你的其他操作
     # 最后关闭窗口
+    
     popup.destroy()
+
 
 def show_filename(event):
     try:
