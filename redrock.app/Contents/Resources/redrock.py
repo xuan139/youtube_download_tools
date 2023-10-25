@@ -53,7 +53,13 @@ def populate_download_listbox():
                     ctime = os.path.getctime(full_path)
                     create_time = datetime.fromtimestamp(ctime).strftime('%Y-%m-%d %H:%M:%S')
                     # Display the filename and create time in the download_listbox
-                    download_listbox.insert("", "end", values=(full_path, "Downloaded", create_time,common_functions.get_file_size(full_path)))
+                    download_listbox.insert("", "end", values=(full_path, "File", create_time,common_functions.get_file_size(full_path)))
+                elif os.path.isdir(full_path):
+                    # This is a directory
+                    download_listbox.insert("", "end", values=(full_path, "Directory", "", ""))  # 使用 tree_instance
+                else:
+                    pass
+
     except:
         update_info('Some error happened')
 
@@ -240,15 +246,7 @@ def on_double_click(event, listbox):
 
 def show_popup(filename):
     try:
-        print('popup filename',filename)
-        matching_files = find_files_with_same_basename(filename)
-
-        for file in matching_files:
-            print("File with the same basename:", file)
-
-        popup = tk.Toplevel(root)
-        popup.title("File Details")
-
+        # update_info(filename)
         # Calculate the screen width and height
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
@@ -261,23 +259,39 @@ def show_popup(filename):
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
 
-        popup.geometry(f"{width}x{height}+{x}+{y}")
+        if os.path.isdir(filename):
+            # 处理目录
+            popup = tk.Toplevel(root)
+            popup.title("Directory Details")
+            # os.chdir(filename)
 
-        # text = tk.Text(popup, wrap="word", height=10, width=40)
-        # text.insert("1.0", f"Filename: {filename}")
-        # text.pack(fill="both", expand=True)  # Expand both horizontally and vertically
+            # subprocess.run(["open", filename])
+            common_functions.open_directory(filename)
 
-        # 创建一个Listbox
-        listbox = tk.Listbox(popup)
-        listbox.pack(fill=tk.BOTH, expand=True)
+        elif os.path.isfile(filename):
+            # 处理文件
+            popup = tk.Toplevel(root)
+            popup.title("File Details")
+            popup.geometry(f"{width}x{height}+{x}+{y}")
+            listbox = tk.Listbox(popup)
+            listbox.pack(fill=tk.BOTH, expand=True)
+
+            matching_files = find_files_with_same_basename(filename)
+
+            for file in matching_files:
+                listbox.insert(tk.END, file)
+
+                # listbox.bind("<Double-1>", on_double_click)
+                # 绑定双击事件处理函数，并传递listbox作为参数
+                listbox.bind("<Double-1>", lambda event, lb=listbox: on_double_click(event, lb))
+
+        else:
+            # 其他情况，可能是不存在的路径
+            print("Path does not exist or is not a file or directory")
+        
+
 
         # 将匹配的文件添加到Listbox中
-        for file in matching_files:
-            listbox.insert(tk.END, file)
-
-        # listbox.bind("<Double-1>", on_double_click)
-        # 绑定双击事件处理函数，并传递listbox作为参数
-        listbox.bind("<Double-1>", lambda event, lb=listbox: on_double_click(event, lb))
 
         button_frame = tk.Frame(popup)
         button_frame.pack(fill="x", expand=True)  # Expand horizontally
@@ -310,7 +324,7 @@ def archive_file(listbox):
                 try:
                     # 直接复制文件到目录
                     shutil.copy(item, output_directory)
-                    # os.remove(item)
+                    os.remove(item)
                 except Exception as e:
                     print(f"Error copying {item} to {output_directory}: {str(e)}")
             else:
