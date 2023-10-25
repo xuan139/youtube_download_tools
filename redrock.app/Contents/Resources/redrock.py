@@ -56,7 +56,9 @@ def populate_download_listbox():
                     download_listbox.insert("", "end", values=(full_path, "File", create_time,common_functions.get_file_size(full_path)))
                 elif os.path.isdir(full_path):
                     # This is a directory
-                    download_listbox.insert("", "end", values=(full_path, "Directory", "", ""))  # 使用 tree_instance
+                    ctime = os.path.getctime(full_path)
+                    create_time = datetime.fromtimestamp(ctime).strftime('%Y-%m-%d %H:%M:%S')
+                    download_listbox.insert("", "end", values=(full_path, "Directory", create_time, ""))
                 else:
                     pass
 
@@ -252,17 +254,19 @@ def show_popup(filename):
         screen_height = root.winfo_screenheight()
 
         # Set the width to 1/6 of the screen width and the height to 1/2 of the screen height
-        width = screen_width // 2
+        width = screen_width // 5
         height = screen_height // 2
 
         # Calculate the X and Y coordinates to center the popup
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
 
+
+
         if os.path.isdir(filename):
             # 处理目录
-            popup = tk.Toplevel(root)
-            popup.title("Directory Details")
+            # popup = tk.Toplevel(root)
+            # popup.title("Directory Details")
             # os.chdir(filename)
 
             # subprocess.run(["open", filename])
@@ -292,11 +296,13 @@ def show_popup(filename):
 
 
         # 将匹配的文件添加到Listbox中
+        infolabel = tk.Label(popup, text="info")
+        infolabel.pack()
 
         button_frame = tk.Frame(popup)
         button_frame.pack(fill="x", expand=True)  # Expand horizontally
 
-        open_button = tk.Button(button_frame, text="Archive", command=archive_file(listbox))
+        open_button = tk.Button(button_frame, text="Archive", command=lambda:archive_file(listbox,infolabel))
         open_button.pack(side="left", fill="x", expand=True)
 
         # play_button = tk.Button(button_frame, text="Open", command=lambda: common_functions.play_video(filename))
@@ -309,9 +315,11 @@ def show_popup(filename):
     except:
         pass
 
+def show_info_dialog(info):
+    # 创建一个新窗口
+    pass
 
-
-def archive_file(listbox):
+def archive_file(listbox,infolabel):
     try:
         output_directory =  listbox.get(0).split(".")[0]
         print('output_directory',output_directory)
@@ -330,7 +338,7 @@ def archive_file(listbox):
             else:
                 print(f"Skipping {item} as it's not a file.")
 
-
+        infolabel.config(text="Archiving is complete.")
     except:
         pass
         
