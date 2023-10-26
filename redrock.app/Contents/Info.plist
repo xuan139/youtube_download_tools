@@ -5,17 +5,17 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
-	<string>redrock</string>
+	<string>RedRock</string>
 	<key>CFBundleExecutable</key>
-	<string>redrock</string>
+	<string>RedRock</string>
 	<key>CFBundleIconFile</key>
 	<string>rocky.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.pythonmac.unspecified.redrock</string>
+	<string>org.pythonmac.unspecified.RedRock</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>redrock</string>
+	<string>RedRock</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

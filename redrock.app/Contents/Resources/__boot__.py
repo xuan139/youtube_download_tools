@@ -132,7 +132,7 @@ def _recipes_pil_prescript(plugins):
     Image.init = init
 
 
-_recipes_pil_prescript(['MspImagePlugin', 'FpxImagePlugin', 'DdsImagePlugin', 'MpoImagePlugin', 'EpsImagePlugin', 'BlpImagePlugin', 'GbrImagePlugin', 'TgaImagePlugin', 'PdfImagePlugin', 'QoiImagePlugin', 'DcxImagePlugin', 'Jpeg2KImagePlugin', 'ImImagePlugin', 'SgiImagePlugin', 'PngImagePlugin', 'WebPImagePlugin', 'GifImagePlugin', 'PalmImagePlugin', 'GribStubImagePlugin', 'IcoImagePlugin', 'FliImagePlugin', 'McIdasImagePlugin', 'JpegImagePlugin', 'XbmImagePlugin', 'TiffImagePlugin', 'FtexImagePlugin', 'WmfImagePlugin', 'CurImagePlugin', 'IcnsImagePlugin', 'MicImagePlugin', 'IptcImagePlugin', 'BmpImagePlugin', 'PpmImagePlugin', 'ImtImagePlugin', 'BufrStubImagePlugin', 'PcxImagePlugin', 'Hdf5StubImagePlugin', 'XVThumbImagePlugin', 'PixarImagePlugin', 'FitsImagePlugin', 'PcdImagePlugin', 'PsdImagePlugin', 'SunImagePlugin', 'MpegImagePlugin', 'SpiderImagePlugin', 'XpmImagePlugin'])
+_recipes_pil_prescript(['MspImagePlugin', 'PsdImagePlugin', 'PngImagePlugin', 'MicImagePlugin', 'GifImagePlugin', 'IcoImagePlugin', 'PpmImagePlugin', 'GribStubImagePlugin', 'PdfImagePlugin', 'FliImagePlugin', 'DcxImagePlugin', 'Jpeg2KImagePlugin', 'CurImagePlugin', 'BmpImagePlugin', 'SunImagePlugin', 'QoiImagePlugin', 'PixarImagePlugin', 'JpegImagePlugin', 'XbmImagePlugin', 'XpmImagePlugin', 'PalmImagePlugin', 'ImtImagePlugin', 'ImImagePlugin', 'McIdasImagePlugin', 'IptcImagePlugin', 'PcdImagePlugin', 'WebPImagePlugin', 'FitsImagePlugin', 'GbrImagePlugin', 'EpsImagePlugin', 'FtexImagePlugin', 'DdsImagePlugin', 'IcnsImagePlugin', 'FpxImagePlugin', 'Hdf5StubImagePlugin', 'BlpImagePlugin', 'MpegImagePlugin', 'SpiderImagePlugin', 'WmfImagePlugin', 'TgaImagePlugin', 'MpoImagePlugin', 'PcxImagePlugin', 'XVThumbImagePlugin', 'TiffImagePlugin', 'SgiImagePlugin', 'BufrStubImagePlugin'])
 
 
 def _setup_ctypes():
@@ -207,6 +207,6 @@ def _setup_openssl():
 _setup_openssl()
 
 
-DEFAULT_SCRIPT='redrock.py'
+DEFAULT_SCRIPT='RedRock.py'
 SCRIPT_MAP={}
 _run()
